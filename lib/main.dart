@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/app_logic.dart';
 import 'package:flutter_application_1/app_task_button.dart';
 import 'package:flutter_application_1/history_list.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // The runApp() function is a Flutter function that takes as its argument a Widget which the framework inflates and attaches to the screen's root to render it.
 void main() {
