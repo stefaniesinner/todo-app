@@ -1,125 +1,175 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:todo_app/app_logic.dart';
+import 'package:todo_app/history_list.dart';
+import 'package:todo_app/add_task_button.dart';
 
+// The runApp() function is a Flutter function that takes as its argument a Widget which the framework inflates and attaches to the screen's root to render it.
 void main() {
-  runApp(const MyApp());
+  runApp(TodoApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// build is a method that describes what the widget looks like by returning a new widget tree. This method is called every time Flutter needs to render the widget or when the state of your widget changes.
 
-  // This widget is the root of your application.
+// MaterialApp is a predefined class in flutter which is the root of your app. It provides many functionalities like theming, navigation, and title.
+class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'Todo List',
+      home: BaseWidget(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+// Scaffold is the basic setup for a page in your app. It's like a blank canvas where you can place different widgets to build your UI. Hover over the Scaffold widget to get more information about it.
+class BaseWidget extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<BaseWidget> createState() => _BaseWidgetState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _BaseWidgetState extends State<BaseWidget> {
+  int currentIndex = 0;
 
-  void _incrementCounter() {
+  final pages = [
+    PendingList(),
+    HistoryList(),
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Todo List',
+            style: GoogleFonts.comicNeue(
+              textStyle: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 3,
+                blurRadius: 10,
+              ),
+            ],
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: <Color>[
+                Colors.redAccent,
+                Colors.purple,
+              ],
+            ),
+          ),
+        ),
+        foregroundColor: Colors.white,
+      ),
+      floatingActionButton: AddTaskButton(),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          selectedItemColor: Colors.redAccent,
+          unselectedItemColor: Colors.grey,
+          currentIndex: currentIndex,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              label: 'History',
+            ),
+          ],
+          onTap: (index) {
+            setState(() {
+              currentIndex = index;
+            });
+          },
+        ),
+      ),
+      body: IndexedStack(
+        index: currentIndex,
+        children: pages,
+      ),
+    );
+  }
+}
+
+// Stateful widgets are widgets that can change their state over time. These widgets are useful when the UI changes dynamically, like when you want to update the UI in response to user actions or when some data changes.
+class PendingList extends StatefulWidget {
+  @override
+  State<PendingList> createState() => _PendingListState();
+}
+
+class _PendingListState extends State<PendingList> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    AppLogic(updatePendingList);
+    super.initState();
+  }
+
+  void updatePendingList() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      print("PendingList Widget: SetState called");
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    print('PendingList Widget: Building Widget');
+
+    // ListView.builder is a better choice when dealing with a large number of items because it only builds those items that are currently visible on the screen, which can greatly improve the performance of your app.
+    return Container(
+      padding: EdgeInsets.only(top: 25),
+      child: ListView.builder(
+        itemCount: AppLogic.pendingWidgetList.length,
+        itemBuilder: (context, index) {
+          return AppLogic.pendingWidgetList[index];
+        },
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+
+
+
+
+/*
+
+SCAFFOLD:
+
+  The Scaffold widget in Flutter provides a framework with a number of features that help in creating a consistent visual structure for an application. Here are some of its main features:
+
+  appBar: This is a widget that is typically displayed at the top of the page as a header. It can contain a title, actions, and other widgets.
+
+  body: This is the primary content of the scaffold. It takes up most of the screen space.
+
+  floatingActionButton: This is a button that is displayed over the body widget, usually in the bottom right corner. It's typically used for a primary action in the application.
+
+  drawer: This is a slide-out menu that is typically used for navigation. It's usually hidden off-screen and can be displayed by swiping from the left edge of the screen or by pressing the menu button in the appBar.
+
+  bottomNavigationBar: This is a bar that appears at the bottom of the screen that can be used for navigation. It usually contains multiple items that can be selected to navigate between different views in the application.
+
+  snackBar: This is a temporary notification that can be displayed at the bottom of the scaffold. It can contain a message and an action.
+
+  backgroundColor: This is the color of the surface of the scaffold.
+
+  resizeToAvoidBottomInset: This determines whether the body should resize when the keyboard appears.
+
+  These are just some of the features provided by the Scaffold widget. It's a very flexible widget that can be customized to suit the needs of your application.
+
+ */
